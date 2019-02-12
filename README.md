@@ -1,4 +1,4 @@
-# AzureStack Uptime Monitor
+# Azure Stack Uptime Monitor
 
 Azure Stack Uptime Monitor is an open source based solution that tests the availability of Azure Stack endpoints and workloads. The solution will start testing Azure Stack endpoints directly after it is deployed. 
 
@@ -21,7 +21,7 @@ To deploy the connected version an activation key is required. The activation ke
 [Deployment of the connected version](/docs/Connected.md)
 
 ## Disconnected version
-The disconnected version does not require an internet connection for the solution. The source VHD, with the required prerequisistes (e.g. linux packages and docker images), is created on Azure, imported into Azure Stack and used as the source VHD for the solution deployment. The diconnected version can not be updated. Once installed, it will have to be fully redeployed to use a newer version, deleting all hisotrical data.
+The disconnected version does not require an internet connection for the solution. The source VHD, with the required prerequisistes (e.g. linux packages and docker images), is created on Azure, imported into Azure Stack and used as the source VHD for the solution deployment. The disconnected version can not be updated. Once installed, it will have to be fully redeployed to use a newer version, deleting all hisotrical data.
 
 [Deployment of the disconnected version](/docs/Disconnected.md)
 
