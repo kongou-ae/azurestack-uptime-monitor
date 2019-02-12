@@ -119,7 +119,7 @@ if [[ $(echo "$RANGE_LAST" | jq -r ".results[].series") == null ]]; then
   RANGE_NEW_ID=$(curl -sX POST \
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
-        -u admin:$(cat /run/secrets/cli | jq -r '.grafanaPassword') \
+        -u $(cat /run/secrets/cli | jq -r '.adminUsername'):$(cat /run/secrets/cli | jq -r '.grafanaPassword') \
         -d "$RANGE_NEW_BODY" http://grafana:3000/api/annotations | jq -r ".id") \
     && azs_log_field T status admin_pnu_new_range_grafana \
     || azs_log_field T status admin_pnu_new_range_grafana fail
@@ -160,7 +160,7 @@ END
   # Update the existing annotation endTime in the Grafana db
   curl -sX PUT -H 'Content-Type: application/json' \
         -H 'Accept: application/json' \
-        -u admin:$(cat /run/secrets/cli | jq -r '.grafanaPassword') \
+        -u $(cat /run/secrets/cli | jq -r '.adminUsername'):$(cat /run/secrets/cli | jq -r '.grafanaPassword') \
         -d "$RANGE_UPDATE_BODY" http://grafana:3000/api/annotations/$RANGE_LAST_ID \
     && azs_log_field T status admin_pnu_update_range_grafana \
     || azs_log_field T status admin_pnu_update_range_grafana fail
@@ -177,7 +177,7 @@ END
     # Create new annotation
     RANGE_NEW_ID=$(curl -sX POST -H "Accept: application/json" \
           -H "Content-Type: application/json" \
-          -u admin:$(cat /run/secrets/cli | jq -r '.grafanaPassword') \
+          -u $(cat /run/secrets/cli | jq -r '.adminUsername'):$(cat /run/secrets/cli | jq -r '.grafanaPassword') \
           -d "$RANGE_NEW_BODY" http://grafana:3000/api/annotations | jq -r ".id") \
       && azs_log_field T status admin_pnu_new_state_grafana \
       || azs_log_field T status admin_pnu_new_state_grafana fail
