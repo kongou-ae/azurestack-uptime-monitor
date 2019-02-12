@@ -7,7 +7,7 @@ The connected version has the following prerequisites.
 
 - Outbound internet connectivity for virtual machines running on Azure Stack.
 - Ubuntu image (18.04-LTS or 16.04-LTS) downloaded from the Azure marketplace feed in Azure Stack marketplace management.
-- The linux vm extension v2.0 downloaded from the Azure marketplace feed in Azure Stack marketplace management.
+- The **Custom Script for Linux v2.0** downloaded from the Azure marketplace feed in Azure Stack marketplace management.
 - A tenant user in the same tenant as the SPN account that has at least **contributor** permissions to a resource group that the solution will be deployed to.
 - An SPN created in the Identity Provider ([AAD](https://docs.microsoft.com/en-us/azure/azure-stack/user/azure-stack-create-service-principals#create-service-principal-for-azure-ad) or [ADFS](https://docs.microsoft.com/en-us/azure/azure-stack/azure-stack-create-service-principals#create-a-service-principal-using-a-client-secret)). The authentication method for the SPN account must be with a key (certificate based authentication is not supported). The SPN must have **reader** permissions on the Azure Stack default provider subscription and **contributor** permissions on an Azure Stack tenant subscription.
 - An SSH key pair for authenticating to the solution VM. [Guide for creating and using the ssh key pair](/docs/SSH.md).
