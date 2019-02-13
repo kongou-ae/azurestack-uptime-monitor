@@ -112,7 +112,8 @@ END
 )
 
 # If no results are returned
-if [[ $(echo "$RANGE_LAST" | jq -r ".results[].series") == null ]]; then
+if [[ $(echo "$RANGE_LAST" | jq -r ".results[].series") = "null" ]]
+then
 
   # Write new annotation to Grafana (no need to update existing one since it doesn't exist yet)
   # Capture the result in a variable for the annotation Id
