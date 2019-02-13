@@ -119,7 +119,7 @@ function azs_bridge
           --account-name $ACCOUNT_NAME \
           --sas-token $(cat /run/secrets/cli | jq -r ".activationKey" | base64 -d | jq -r ".token") \
           --source /azs/cli/export \
-  && azs_log_field T status azs_bridge
+  && azs_log_field T status azs_bridge \
   || azs_log_field T status azs_bridge fail
 }
 
