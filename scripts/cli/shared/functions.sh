@@ -96,7 +96,7 @@ function azs_registration
   local ACCOUNT=$(echo $ARGUMENTS_JSON | jq -r ".activationKey" | base64 -d | jq -r ".account")
   [ $ACCOUNT != "azsuptime" ] && { echo "Activation key is invalid" ; exit 1 ; }
 
-  local FILENAME=registration-$(echo $ARGUMENTS_JSON | jq -r ".tenantSubscriptionId")-$(date --utc +y%Gw%V--m%md%dh%Hm%M)
+  local FILENAME=deploy-$(echo $ARGUMENTS_JSON | jq -r ".tenantSubscriptionId")-$(date --utc +y%Ym%md%dh%Hm%M)-v$(sudo cat /azs/common/config.json | jq -r ".version.script").log
   echo "registration" > $FILENAME
 
   az storage blob upload \
