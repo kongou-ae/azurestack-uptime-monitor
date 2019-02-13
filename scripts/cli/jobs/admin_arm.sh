@@ -3,8 +3,9 @@
 # Source functions.sh
 source /azs/cli/shared/functions.sh \
   && echo "Sourced functions.sh" \
-  || { echo "Failed to source functions.sh" ; exit ; }
+  || { echo "Failed to source functions.sh" ; exit 1 ; }
 
+azs_job_start
 ################################# Task: Probe #################################
 azs_task_start probe
 

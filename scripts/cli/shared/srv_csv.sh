@@ -3,10 +3,11 @@
 # Source functions.sh
 source /azs/cli/shared/functions.sh \
   && echo "Sourced functions.sh" \
-  || { echo "Failed to source functions.sh" ; exit ; }
+  || { echo "Failed to source functions.sh" ; exit 1 ; }
 
-################################# Task: Export ################################
-azs_task_start export
+azs_job_start
+################################# Task: CSV ###################################
+azs_task_start csv
 
 # To specify a specific to export run ./export_csv.sh year week
 # E.g. /export_csv.sh 2019 5
@@ -54,6 +55,6 @@ curl -G 'http://influxdb:8086/query?db=azs' \
   && azs_log_field T status srv_export_csv_to_file \
   || azs_log_field T status srv_export_csv_to_file fail
 
-azs_task_end export
+azs_task_end csv
 ############################### Job: Complete #################################
 azs_job_end

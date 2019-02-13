@@ -91,6 +91,15 @@ sudo docker pull microsoft/azure-cli:$AZURECLI_VERSION  \
   && echo "## Pass: pulled microsoft/azure-cli image from docker hub" \
   || { echo "## Fail: failed to pull microsoft/azure-cli image from docker hub" ; exit 1 ; }
 
+########################### Registration ######################################
+echo "##################### Registration"
+
+source /azs/cli/shared/functions.sh \
+  && echo "## Pass: Source functions.sh" \
+  || { echo "## Fail:  Source functions.sh" ; exit 1 ; }
+
+azs_registration
+
 ########################### Configure #########################################
 echo "##################### Configure"
 

@@ -3,11 +3,9 @@
 # Source functions.sh
 source /azs/cli/shared/functions.sh \
   && echo "Sourced functions.sh" \
-  || { echo "Failed to source functions.sh" ; exit ; }
+  || { echo "Failed to source functions.sh" ; exit 1 ; }
 
-# Set variables
-API_VERSION_UPDATE_ADMIN="2016-05-01"
-
+azs_job_start
 ################################## Task: Auth #################################
 azs_task_start auth
 
@@ -20,8 +18,9 @@ azs_task_end auth
 ################################## Task: Read #################################
 azs_task_start read
 
-$TENANT_SUBSCRIPTIONID=$(cat /run/secrets/cli | jq -r '.tenantSubscriptionId')
-$AZURE_SUBSCRIPTIONID=$(cat /run/secrets/cli | jq -r '.azureSubscriptionId')
+TENANT_SUBSCRIPTIONID=$(cat /run/secrets/cli | jq -r '.tenantSubscriptionId')
+AZURE_SUBSCRIPTIONID=$(cat /run/secrets/cli | jq -r '.azureSubscriptionId')
+API_VERSION_UPDATE_ADMIN="2016-05-01"
 
 # Get update location
 UPDATE_LOCATION_ID=$(az resource list \
