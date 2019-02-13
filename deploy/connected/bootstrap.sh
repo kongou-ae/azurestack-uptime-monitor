@@ -94,6 +94,18 @@ sudo docker pull microsoft/azure-cli:$AZURECLI_VERSION  \
 ########################### Registration ######################################
 echo "##################### Registration"
 
+  # Set to Azure Cloud first to cleanup a profile from failed deployments
+  az cloud set \
+    --name AzureCloud \
+  && echo "## Pass: select AzureCloud" \
+  || { echo "## Fail: select cloud" ; exit 1 ; }
+
+  # Cleanup existing profile from failed deployment
+  az cloud unregister \
+      --name AzureStackCloud \
+  && echo "## Pass: unregister AzureStackCloud" \
+  || echo "## Pass: AzureStackCloud does not exist yet" 
+
 source /azs/cli/shared/functions.sh \
   && echo "## Pass: Source functions.sh" \
   || { echo "## Fail:  Source functions.sh" ; exit 1 ; }
@@ -173,18 +185,6 @@ function azs_login
   export REQUESTS_CA_BUNDLE=/azs/cli/shared/Certificates.pem \
     && echo "## Pass: set REQUESTS_CA_BUNDLE with AzureStack root CA" \
     || { echo "## Fail: set REQUESTS_CA_BUNDLE with AzureStack root CA" ; exit 1 ; }
-
-  # Set to Azure Cloud first to cleanup a profile from failed deployments
-  az cloud set \
-    --name AzureCloud \
-  && echo "## Pass: select AzureCloud" \
-  || { echo "## Fail: select cloud" ; exit 1 ; }
-
-  # Cleanup existing profile from failed deployment
-  az cloud unregister \
-      --name AzureStackCloud \
-  && echo "## Pass: unregister AzureStackCloud" \
-  || echo "## Pass: AzureStackCloud does not exist yet" 
 
   az cloud register \
       --name AzureStackCloud \
