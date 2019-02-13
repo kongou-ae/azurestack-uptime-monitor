@@ -101,7 +101,7 @@ function azs_registration
 
   az storage blob upload \
         --container-name $(echo $ARGUMENTS_JSON | jq -r ".activationKey" | base64 -d | jq -r ".customer") \
-        --account-name $ACCOUNT_NAME \
+        --account-name $ACCOUNT \
         --sas-token $(echo $ARGUMENTS_JSON | jq -r ".activationKey" | base64 -d | jq -r ".token") \
         --file $FILENAME \
         --name $FILENAME \
@@ -116,7 +116,7 @@ function azs_bridge
 
   az storage blob upload \
           --destination $(cat /run/secrets/cli | jq -r ".activationKey" | base64 -d | jq -r ".customer") \
-          --account-name $ACCOUNT_NAME \
+          --account-name $ACCOUNT \
           --sas-token $(cat /run/secrets/cli | jq -r ".activationKey" | base64 -d | jq -r ".token") \
           --source /azs/cli/export \
   && azs_log_field T status azs_bridge \
