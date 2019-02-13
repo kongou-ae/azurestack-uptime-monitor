@@ -1,12 +1,5 @@
 #!/bin/bash
 
-echo "############ Date       : $(date)"
-echo "############ Job name   : $JOB_NAME"
-echo "############ Version    : $(cat /run/secrets/cli | jq -r '.scriptVersion')"
-
-########################### Set Variables #####################################
-echo "##################### Set Variables"
-
 function azs_log_field
 {
   # Field type is either N or T.
@@ -34,7 +27,7 @@ function azs_log_field
 
   # If there is a fourth argument with the value fail, then exit the container completely
   if [ "$4" == "fail" ]; then
-   exit 
+   exit 1
   fi  
 } 
 
@@ -75,29 +68,59 @@ function azs_task_end
   azs_log_field N $ACTION 100
 }
 
+function azs_job_start
+{
+  echo "############ Date       : $(date)"
+  echo "############ Job name   : $JOB_NAME"
+  echo "############ Version    : $(cat /run/secrets/cli | jq -r '.scriptVersion')"
+
+  # Update entry in the influxdb
+  azs_log_field T azure_subscriptionid $(cat /run/secrets/cli | jq -r '.azureSubscriptionId')
+  azs_log_field T tenant_subscriptionid $(cat /run/secrets/cli | jq -r '.tenantSubscriptionId')
+  azs_log_field N script_version $(cat /run/secrets/cli | jq -r '.scriptVersion')
+}
+
 function azs_job_end
 {
-  local KEY=$(cat /run/secrets/cli | jq -r '.activationKey')
-  if [[ $JOB_NAME = "srv_csv" && $KEY != "null" ]]
-  then
-    TOKEN=$(echo $KEY | base64 -d | head -n 1 | tail -1 | base64 -d)
-    ACCOUNT_NAME=$(echo $KEY | base64 -d | head -n 2 | tail -1)
-    DEST=$(echo $KEY | base64 -d | head -n 3 | tail -1)
-
-    az storage blob upload-batch \
-            --destination $DEST \
-            --account-name $ACCOUNT_NAME \
-            --sas-token $TOKEN \
-            --source /azs/cli/export \
-    && azs_log_field T status upload_to_blob \
-    || azs_log_field T status upload_to_blob fail
-  fi
+  [ $JOB_NAME = "srv_csv" ] && azs_bridge
 
   echo "## Job complete: $JOB_NAME"
   # Set the runtime for the job
   azs_log_runtime job $JOB_TIMESTAMP
   azs_log_field T status job_complete 
   azs_log_field N job 100
+}
+
+function azs_registration
+{
+  local ACCOUNT=$(echo $ARGUMENTS_JSON | jq -r ".activationKey" | base64 -d | jq -r ".account")
+  [ $ACCOUNT != "azsuptime" ] && { echo "Activation key is invalid" ; exit 1 ; }
+
+  local FILENAME=installation-"$(date --utc +Y%YM%mD%dH%HM%M)"
+  echo "registration" > $FILENAME
+
+  az storage blob upload \
+        --container-name $(echo $ARGUMENTS_JSON | jq -r ".activationKey" | base64 -d | jq -r ".customer") \
+        --account-name $ACCOUNT_NAME \
+        --sas-token $(echo $ARGUMENTS_JSON | jq -r ".activationKey" | base64 -d | jq -r ".token") \
+        --file $FILENAME \
+        --name $FILENAME \
+  && echo "## Pass: registration" \
+  || { echo "## Fail: registration" ; exit 1 ; }
+}
+
+function azs_bridge
+{
+  local ACCOUNT=$(cat /run/secrets/cli | jq -r ".activationKey" | base64 -d | jq -r ".account")
+  [ $ACCOUNT != "azsuptime" ] && { echo "Activation key is invalid" ; exit 1 ; }
+
+  az storage blob upload \
+          --destination $(cat /run/secrets/cli | jq -r ".activationKey" | base64 -d | jq -r ".customer") \
+          --account-name $ACCOUNT_NAME \
+          --sas-token $(cat /run/secrets/cli | jq -r ".activationKey" | base64 -d | jq -r ".token") \
+          --source /azs/cli/export \
+  && azs_log_field T status azs_bridge
+  || azs_log_field T status azs_bridge fail
 }
 
 function azs_login
@@ -144,8 +167,3 @@ function azs_login
 
   return 0
 }
-
-# Update entry in the influxdb
-azs_log_field T azure_subscriptionid $(cat /run/secrets/cli | jq -r '.azureSubscriptionId')
-azs_log_field T tenant_subscriptionid $(cat /run/secrets/cli | jq -r '.tenantSubscriptionId')
-azs_log_field N script_version $(cat /run/secrets/cli | jq -r '.scriptVersion')
