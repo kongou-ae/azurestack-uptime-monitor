@@ -1,6 +1,6 @@
 {
     "version":{
-        "script":"0.8",
+        "script":"0.9",
         "influxdb":"1.7.3",
         "grafana":"5.4.3",
         "azurecli":"2.0.57"
