@@ -284,7 +284,7 @@
                 "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                    "timestamp": 1
+                    "timestamp": 2
                 },
                 "protectedSettings": {
                     "commandToExecute": "[concat('/bin/bash /azs/disconnected/bootstrap.sh ', variables('singleQuote'), string(variables('scriptArguments')), variables('singleQuote'),' ',reference(variables('names').storage).primaryEndpoints.blob)]",

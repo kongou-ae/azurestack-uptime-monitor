@@ -46,9 +46,21 @@ UNIQUE_STRING=$(echo $ARGUMENTS_JSON | jq -r ".uniqueString") \
   && echo "## Pass: set variable UNIQUE_STRING" \
   || { echo "## Fail: set variable UNIQUE_STRING" ; exit 1 ; }
 
-LINUX_USERNAME=$(echo $ARGUMENTS_JSON | jq -r ".linuxUsername") \
-  && echo "## Pass: set variable LINUX_USERNAME" \
-  || { echo "## Fail: set variable LINUX_USERNAME" ; exit 1 ; }
+ADMIN_USERNAME=$(echo $ARGUMENTS_JSON | jq -r ".adminUsername") \
+  && echo "## Pass: set variable ADMIN_USERNAME" \
+  || { echo "## Fail: set variable ADMIN_USERNAME" ; exit 1 ; }
+
+INFLUXDB_VERSION=$(sudo cat /azs/common/config.json | jq -r ".version.influxdb") \
+  && echo "## Pass: retrieve influxdb version from config" \
+  || { echo "## Fail: retrieve influxdb version from config" ; exit 1 ; }
+
+GRAFANA_VERSION=$(sudo cat /azs/common/config.json | jq -r ".version.grafana") \
+  && echo "## Pass: retrieve grafana version from config" \
+  || { echo "## Fail: retrieve grafana version from config" ; exit 1 ; }
+
+AZURECLI_VERSION=$(sudo cat /azs/common/config.json | jq -r ".version.azurecli") \
+  && echo "## Pass: retrieve azurecli version from config" \
+  || { echo "## Fail: retrieve azurecli version from config" ; exit 1 ; }
 
 # Permissions
 
@@ -247,9 +259,9 @@ sudo docker swarm init \
   && echo "## Pass: initialize Docker Swarm" \
   || echo "## Pass: Docker Swarm is already initialized"
 
-sudo crontab -u $LINUX_USERNAME -r \
-  && echo "## Pass: remove existing crontab for $LINUX_USERNAME" \
-  || echo "## Pass: crontab is not yet configured for $LINUX_USERNAME"
+sudo crontab -u $ADMIN_USERNAME -r \
+  && echo "## Pass: remove existing crontab for $ADMIN_USERNAME" \
+  || echo "## Pass: crontab is not yet configured for $ADMIN_USERNAME"
 
 sudo docker service rm $(sudo docker service ls --format "{{.ID}}") \
   && echo "## Pass: removed existing docker services" \
@@ -332,9 +344,9 @@ do
 done
 
 # Crontab
-sudo crontab -u $LINUX_USERNAME /azs/common/cron_tab.conf \
-  && echo "## Pass: create crontab for $LINUX_USERNAME" \
-  || { echo "## Fail: create crontab for $LINUX_USERNAME" ; exit 1 ; }
+sudo crontab -u $ADMIN_USERNAME /azs/common/cron_tab.conf \
+  && echo "## Pass: create crontab for $ADMIN_USERNAME" \
+  || { echo "## Fail: create crontab for $ADMIN_USERNAME" ; exit 1 ; }
 
 # InfluxDB retention policy
 curl -sX POST "http://localhost:8086/query?db=azs" \
