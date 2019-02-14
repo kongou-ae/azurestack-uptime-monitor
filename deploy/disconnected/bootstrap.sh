@@ -252,35 +252,16 @@ azs_bridge
 
 azs_logout
 
-########################### Remove Existing Services ##########################
-echo "##################### Remove Existing Services"
-
-sudo docker swarm init \
-  && echo "## Pass: initialize Docker Swarm" \
-  || echo "## Pass: Docker Swarm is already initialized"
-
-sudo crontab -u $ADMIN_USERNAME -r \
-  && echo "## Pass: remove existing crontab for $ADMIN_USERNAME" \
-  || echo "## Pass: crontab is not yet configured for $ADMIN_USERNAME"
-
-sudo docker service rm $(sudo docker service ls --format "{{.ID}}") \
-  && echo "## Pass: removed existing docker services" \
-  || echo "## Pass: no exisiting docker service found"
-    
-sudo docker secret rm $(sudo docker secret ls --format "{{.ID}}") \
-  && echo "## Pass: removed existing docker secrets" \
-  || echo "## Pass: no exisiting docker secret found"
-
 ########################### Create Services ###################################
 echo "##################### Create Services"
 
+sudo docker swarm init \
+  && echo "## Pass: initialize Docker Swarm" \
+  || { echo "## Fail: Docker Swarm is already initialized" ; exit 1 ; }
+
 sudo docker network create --driver overlay azs \
   && echo "## Pass: create network overlay azs" \
-  || echo "## Pass: network overlay azs already exists"
-
-echo $ARGUMENTS_JSON | jq -r ".grafanaPassword" | sudo docker secret create grafana - \
-  && echo "## Pass: create docker secret grafana" \
-  || { echo "## Fail: create docker secret grafana" ; exit 1 ; }
+  || { echo "## Fail: network overlay azs already initialized" ; exit 1 ; }
 
 ARGUMENTS_JSON=$(echo $ARGUMENTS_JSON \
       | jq --arg X $FQDN '. + {fqdn: $X}') \
