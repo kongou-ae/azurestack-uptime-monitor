@@ -3,12 +3,14 @@
     "contentVersion": "1.0.0.0",
     "apiProfile": "2018-03-01-hybrid",
     "parameters": {
+        "managedDiskResourceId": {
+            "type": "string"
+        },
         "adminUsername": {
             "type": "string",
-            "defaultValue": "azureadmin"
-        },
-        "sshPublicKey": {
-            "type": "string"
+            "metadata": {
+                "description": "This must be the same username used for the deployment of the source VHD"
+            }
         },
         "appId": {
             "type": "string"
@@ -21,14 +23,6 @@
             "metadata": {
                 "description": "Password for the Grafana portal"
             }
-        },
-        "ubuntuSku": {
-            "type": "string",
-            "allowedValues": [
-                "16.04-LTS",
-                "18.04-LTS"
-            ],
-            "defaultValue": "18.04-LTS"
         }
     },
     "variables": {
@@ -47,29 +41,27 @@
             "apiProfile": "[deployment().properties.template.apiProfile]"
         },
         "scriptArguments": {
-            "activationKey":"[parameters('activationKey')]",
             "tenantSubscriptionId": "[subscription().subscriptionId]",
             "appId": "[parameters('appId')]",
             "appKey": "[parameters('appKey')]",
             "tenantId": "[subscription().tenantId]",
             "grafanaPassword": "[parameters('grafanaPassword')]",
-            "linuxUsername":"[parameters('adminUsername')]",
-            "uniqueString":"[uniqueString(concat(variables('prefix'),resourceGroup().id))]",
-            "storageAccount":"[concat('export',uniqueString(resourceGroup().id))]",
-            "resourceGroup":"[resourceGroup().name]",
-            "location":"[resourceGroup().location]",
-            "apiProfile":"[deployment().properties.template.apiProfile]"
+            "adminUsername": "[parameters('adminUsername')]",
+            "uniqueString": "[uniqueString(concat(variables('prefix'),resourceGroup().id))]",
+            "storageAccount": "[concat('export',uniqueString(resourceGroup().id))]",
+            "resourceGroup": "[resourceGroup().name]",
+            "location": "[resourceGroup().location]",
+            "apiProfile": "[deployment().properties.template.apiProfile]"
         },
         "singleQuote": "'"
-
     },
     "resources": [
         {
             "name": "[variables('names').storage]",
             "type": "Microsoft.Storage/storageAccounts",
             "location": "[resourceGroup().location]",
-            "sku":{
-                "name":"Standard_LRS"
+            "sku": {
+                "name": "Standard_LRS"
             }
         },
         {
@@ -257,35 +249,17 @@
                 "[concat('Microsoft.Network/networkInterfaces/', variables('names').vNic)]"
             ],
             "properties": {
-                "osProfile": {
-                    "computerName": "[variables('names').vm]",
-                    "adminUsername": "[parameters('adminUsername')]",
-                    "linuxConfiguration": {
-                        "disablePasswordAuthentication": true,
-                        "ssh": {
-                            "publicKeys": [
-                                {
-                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-                                    "keyData": "[parameters('sshPublicKey')]"
-                                }
-                            ]
-                        }
-                    }
-                },
                 "hardwareProfile": {
                     "vmSize": "[variables('vmSize')]"
                 },
                 "storageProfile": {
-                    "imageReference": {
-                        "publisher": "Canonical",
-                        "offer": "UbuntuServer",
-                        "sku": "[parameters('ubuntuSku')]",
-                        "version": "latest"
-                    },
                     "osDisk": {
-                        "name": "[concat(variables('prefix'),'osdisk')]",
-                        "createOption": "FromImage",
-                        "caching": "ReadWrite"
+                        "createOption": "Attach",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "id": "[parameters('managedDiskResourceId')]"
+                        },
+                        "osType": "Linux"
                     }
                 },
                 "networkProfile": {
@@ -310,7 +284,7 @@
                 "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                    "timestamp": "1"
+                    "timestamp": 1
                 },
                 "protectedSettings": {
                     "commandToExecute": "[concat('/bin/bash /azs/disconnected/bootstrap.sh ', variables('singleQuote'), string(variables('scriptArguments')), variables('singleQuote'),' ',reference(variables('names').storage).primaryEndpoints.blob)]",
@@ -320,11 +294,11 @@
         }
     ],
     "outputs": {
-        "grafanaEndpoint":{
+        "grafanaEndpoint": {
             "type": "string",
             "value": "[concat('http://',reference(resourceId('Microsoft.Network/publicIPAddresses',variables('names').pubIp)).IpAddress,':3000')]"
         },
-        "sshEndpoint":{
+        "sshEndpoint": {
             "type": "string",
             "value": "[concat('ssh ',parameters('adminUsername'),'@',reference(resourceId('Microsoft.Network/publicIPAddresses',variables('names').pubIp)).IpAddress)]"
         }
