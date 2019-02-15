@@ -46,9 +46,21 @@ UNIQUE_STRING=$(echo $ARGUMENTS_JSON | jq -r ".uniqueString") \
   && echo "## Pass: set variable UNIQUE_STRING" \
   || { echo "## Fail: set variable UNIQUE_STRING" ; exit 1 ; }
 
-LINUX_USERNAME=$(echo $ARGUMENTS_JSON | jq -r ".linuxUsername") \
-  && echo "## Pass: set variable LINUX_USERNAME" \
-  || { echo "## Fail: set variable LINUX_USERNAME" ; exit 1 ; }
+ADMIN_USERNAME=$(echo $ARGUMENTS_JSON | jq -r ".adminUsername") \
+  && echo "## Pass: set variable ADMIN_USERNAME" \
+  || { echo "## Fail: set variable ADMIN_USERNAME" ; exit 1 ; }
+
+INFLUXDB_VERSION=$(sudo cat /azs/common/config.json | jq -r ".version.influxdb") \
+  && echo "## Pass: retrieve influxdb version from config" \
+  || { echo "## Fail: retrieve influxdb version from config" ; exit 1 ; }
+
+GRAFANA_VERSION=$(sudo cat /azs/common/config.json | jq -r ".version.grafana") \
+  && echo "## Pass: retrieve grafana version from config" \
+  || { echo "## Fail: retrieve grafana version from config" ; exit 1 ; }
+
+AZURECLI_VERSION=$(sudo cat /azs/common/config.json | jq -r ".version.azurecli") \
+  && echo "## Pass: retrieve azurecli version from config" \
+  || { echo "## Fail: retrieve azurecli version from config" ; exit 1 ; }
 
 # Permissions
 
@@ -240,35 +252,16 @@ azs_bridge
 
 azs_logout
 
-########################### Remove Existing Services ##########################
-echo "##################### Remove Existing Services"
-
-sudo docker swarm init \
-  && echo "## Pass: initialize Docker Swarm" \
-  || echo "## Pass: Docker Swarm is already initialized"
-
-sudo crontab -u $LINUX_USERNAME -r \
-  && echo "## Pass: remove existing crontab for $LINUX_USERNAME" \
-  || echo "## Pass: crontab is not yet configured for $LINUX_USERNAME"
-
-sudo docker service rm $(sudo docker service ls --format "{{.ID}}") \
-  && echo "## Pass: removed existing docker services" \
-  || echo "## Pass: no exisiting docker service found"
-    
-sudo docker secret rm $(sudo docker secret ls --format "{{.ID}}") \
-  && echo "## Pass: removed existing docker secrets" \
-  || echo "## Pass: no exisiting docker secret found"
-
 ########################### Create Services ###################################
 echo "##################### Create Services"
 
+sudo docker swarm init \
+  && echo "## Pass: initialize Docker Swarm" \
+  || { echo "## Fail: Docker Swarm is already initialized" ; exit 1 ; }
+
 sudo docker network create --driver overlay azs \
   && echo "## Pass: create network overlay azs" \
-  || echo "## Pass: network overlay azs already exists"
-
-echo $ARGUMENTS_JSON | jq -r ".grafanaPassword" | sudo docker secret create grafana - \
-  && echo "## Pass: create docker secret grafana" \
-  || { echo "## Fail: create docker secret grafana" ; exit 1 ; }
+  || { echo "## Fail: network overlay azs already initialized" ; exit 1 ; }
 
 ARGUMENTS_JSON=$(echo $ARGUMENTS_JSON \
       | jq --arg X $FQDN '. + {fqdn: $X}') \
@@ -332,9 +325,9 @@ do
 done
 
 # Crontab
-sudo crontab -u $LINUX_USERNAME /azs/common/cron_tab.conf \
-  && echo "## Pass: create crontab for $LINUX_USERNAME" \
-  || { echo "## Fail: create crontab for $LINUX_USERNAME" ; exit 1 ; }
+sudo crontab -u $ADMIN_USERNAME /azs/common/cron_tab.conf \
+  && echo "## Pass: create crontab for $ADMIN_USERNAME" \
+  || { echo "## Fail: create crontab for $ADMIN_USERNAME" ; exit 1 ; }
 
 # InfluxDB retention policy
 curl -sX POST "http://localhost:8086/query?db=azs" \

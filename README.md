@@ -18,12 +18,12 @@ The solution only runs open source software and does not require any licenses. T
 The connected version required internet connectivity. New updates (e.g. new tests and dashboards) are made available to the solution based on feedback. The connected version can be updated with new features.
 To deploy the connected version an activation key is required. The activation key can be requested by submitting a [request](https://github.com/Azure/azurestack-uptime-monitor/issues/new?assignees=&labels=&template=request-activation-key.md&title=Please+provide+me+with+an+activation+key) on this repository.
 
-[Deployment of the connected version](/docs/Connected.md)
+[Deploy the connected version](/docs/Connected.md)
 
 ## Disconnected version
 The disconnected version does not require an internet connection for the solution. The source VHD, with the required prerequisistes (e.g. linux packages and docker images), is created on Azure, imported into Azure Stack and used as the source VHD for the solution deployment. The disconnected version can not be updated. Once installed, it will have to be fully redeployed to use a newer version, deleting all hisotrical data.
 
-[Deployment of the disconnected version](/docs/Disconnected.md)
+[Deploy the disconnected version](/docs/Disconnected.md)
 
 ## Telemetry
 The connected version sends telemetry to Microsoft. The telemetry does not contain any PII data.  The content of the telemetry is stored in CSV files on Azure Stack and can be reviewed in the storage container of the solution's resource group (e.g. export7dyjlrji2i5qa > csv > 75e9f0e8-6a4d-4c0c-8c7c-bef5f533a844-y2019w05.csv). The disconnected version does not send any telemetry data to Microsoft, but you can retrieve the CSV files from the storage container in the solution's resource group in Azure Stack.
