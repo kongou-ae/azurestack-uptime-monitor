@@ -324,7 +324,7 @@
                 "protectedSettings": {
                     "commandToExecute": "[concat('/bin/bash bootstrap.sh ', variables('singleQuote'), string(variables('scriptArguments')), variables('singleQuote'),' ',reference(variables('names').storage).primaryEndpoints.blob)]",
                     "fileUris": [
-                        "https://raw.githubusercontent.com/Azure/azurestack-uptime-monitor/master/deploy/connected/bootstrap.sh"
+                        "https://raw.githubusercontent.com/Azure/azurestack-uptime-monitor/master/scripts/deploy/connected.sh"
                     ]
                 }
             }

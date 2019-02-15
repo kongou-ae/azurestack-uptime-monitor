@@ -32,6 +32,9 @@
             "/cli/shared/srv_blob.sh",
             "/cli/shared/srv_csv.sh",
             "/cli/shared/srv_pnu.sh"
+        ],
+        "deploy": [
+            "/deploy/disconnected.sh"
         ]
     }
 }

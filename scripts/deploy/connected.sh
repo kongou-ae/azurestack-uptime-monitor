@@ -48,7 +48,7 @@ sudo apt-get install -y docker-ce \
 
 # Files
 
-sudo mkdir -p /azs/{influxdb,grafana/{database,datasources,dashboards},common,cli/{jobs,shared,export,log}} \
+sudo mkdir -p /azs/{influxdb,grafana/{database,datasources,dashboards},common,cli/{jobs,shared,export,log},deploy} \
   && echo "## Pass: created directory structure" \
   || { echo "## Fail: failed to create directory structure" ; exit 1 ; }
 

@@ -45,7 +45,7 @@ sudo apt-get install -y docker-ce \
 
 # Files
 
-sudo mkdir -p /azs/{influxdb,grafana/{database,datasources,dashboards},common,cli/{jobs,shared,export,log}} \
+sudo mkdir -p /azs/{influxdb,grafana/{database,datasources,dashboards},common,cli/{jobs,shared,export,log},deploy} \
   && echo "## Pass: created directory structure" \
   || { echo "## Fail: failed to create directory structure" ; exit 1 ; }
 
@@ -87,15 +87,3 @@ sudo docker pull grafana/grafana:$GRAFANA_VERSION \
 sudo docker pull microsoft/azure-cli:$AZURECLI_VERSION  \
   && echo "## Pass: pulled microsoft/azure-cli image from docker hub" \
   || { echo "## Fail: failed to pull microsoft/azure-cli image from docker hub" ; exit 1 ; }
-
-# Bootstrap
-
-sudo mkdir -p /azs/disconnected \
-  && echo "## Pass: create directory disconnected" \
-  || { echo "## Fail: create directory disconnected" ; exit 1 ; }
-
-sudo curl -s \
-      "$BASE_URL"/deploy/disconnected/bootstrap.sh \
-      --output /azs/disconnected/bootstrap.sh \
-  && echo "## Pass: download bootstrap" \
-  || { echo "## Fail: download bootstrap" ; exit 1 ; }
