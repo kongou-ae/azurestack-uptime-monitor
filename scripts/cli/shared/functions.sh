@@ -127,8 +127,8 @@ function azs_login
 {
   local FQDNHOST=$1
 
-  # Set REQUESTS_CA_BUNDLE variable with AzureStack root CA
-  export REQUESTS_CA_BUNDLE=/azs/cli/shared/Certificates.pem \
+  # Set REQUESTS_CA_BUNDLE variable with ca bundle
+  export REQUESTS_CA_BUNDLE=/azs/cli/shared/ca-bundle.crt \
     && azs_log_field T status auth_ca_bundle \
     || azs_log_field T status auth_ca_bundle fail
 

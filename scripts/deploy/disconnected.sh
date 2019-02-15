@@ -62,11 +62,19 @@ AZURECLI_VERSION=$(sudo cat /azs/common/config.json | jq -r ".version.azurecli")
   && echo "## Pass: retrieve azurecli version from config" \
   || { echo "## Fail: retrieve azurecli version from config" ; exit 1 ; }
 
-# Permissions
+# Certificates
 
-sudo cp /var/lib/waagent/Certificates.pem /azs/cli/shared/Certificates.pem \
-  && echo "## Pass: copy the waagent cert to the common directory" \
-  || { echo "## Fail: copy the waagent cert to the common directory" ; exit 1 ; }
+sudo cat /etc/ssl/certs/ca-certificates.crt \
+      | sudo tee /azs/cli/shared/ca-bundle.crt > /dev/null \
+  && echo "## Pass: copy the ca-certificates bundle" \
+  || { echo "## Fail: copy the ca-certificates bundle" ; exit 1 ; }
+
+sudo cat /var/lib/waagent/Certificates.pem \
+      | sudo tee -a /azs/cli/shared/ca-bundle.crt > /dev/null \
+  && echo "## Pass: append the waagent cert to the ca bundle" \
+  || { echo "## Fail: append the waagent cert to the ca bundle" ; exit 1 ; }
+
+# Permissions
 
 sudo chmod -R 755 /azs/{common,cli/{jobs,shared,export}} \
   && echo "## Pass: set execute permissions for directories" \
@@ -83,9 +91,9 @@ function azs_login
 {
   local FQDNHOST=$1
 
-  export REQUESTS_CA_BUNDLE=/azs/cli/shared/Certificates.pem \
-    && echo "## Pass: set REQUESTS_CA_BUNDLE with AzureStack root CA" \
-    || { echo "## Fail: set REQUESTS_CA_BUNDLE with AzureStack root CA" ; exit 1 ; }
+  export REQUESTS_CA_BUNDLE=/azs/cli/shared/ca-bundle.crt \
+    && echo "## Pass: set REQUESTS_CA_BUNDLE with ca bundle" \
+    || { echo "## Fail: set REQUESTS_CA_BUNDLE with ca bundle" ; exit 1 ; }
 
   # Set to Azure Cloud first to cleanup a profile from failed deployments
   az cloud set \
