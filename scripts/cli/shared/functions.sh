@@ -82,7 +82,9 @@ function azs_job_start
 
 function azs_job_end
 {
-  [ $JOB_NAME = "srv_csv" ] && azs_bridge
+  [[ $JOB_NAME = "srv_csv" || $JOB_NAME = "debug_export" ]] \
+  && [[ $(cat /run/secrets/cli | jq -r ".activationKey") != "null" ]] \
+  && azs_bridge
 
   echo "## Job complete: $JOB_NAME"
   # Set the runtime for the job
