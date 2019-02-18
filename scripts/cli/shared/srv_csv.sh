@@ -9,11 +9,12 @@ azs_job_start
 ################################# Task: CSV ###################################
 azs_task_start csv
 
-# To specify a specific to export run ./export_csv.sh year week
-# E.g. /export_csv.sh 2019 5
+# To specify a specific to export run ./srv_csv.sh year week
+# E.g. srv_csv.sh 2019 5
 # If no argumetns are passed the script exports last weeks data
+
 YEAR=${1:-$(date --utc +%G)}
-WEEK=${2:-$(( $(date --utc +%V) - 1 ))}
+WEEK=${2:-$(( $(date --utc +%-V) - 1 ))}
 ONE_DAY_IN_SEC=86400
 
 # Base Epoch date for year and week in seconds 
