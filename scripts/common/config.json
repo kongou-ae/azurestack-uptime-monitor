@@ -1,6 +1,6 @@
 {
     "version":{
-        "script":"0.9",
+        "script":"1.0",
         "influxdb":"1.7.3",
         "grafana":"5.4.3",
         "azurecli":"2.0.57"
@@ -10,7 +10,8 @@
             "/common/config.json",
             "/common/cron_job.sh",
             "/common/cron_tab.conf",
-            "/common/debug_azurecli.sh"
+            "/common/debug_azurecli.sh",
+            "/common/debug_export.sh"
         ],
         "dashboards": [
             "/grafana/dashboards/availability.yaml",

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 YEAR=${1:-$(date --utc +%G)}
-WEEK=${2:-$(( $(date --utc +%V) - 1 ))}
+WEEK=${2:-$(( $(date --utc +%-V) - 1 ))}
 
 echo "YEAR : $YEAR"
 echo "WEEK : $WEEK"
