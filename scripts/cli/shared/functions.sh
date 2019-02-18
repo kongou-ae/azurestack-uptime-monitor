@@ -116,13 +116,19 @@ function azs_bridge
   local ACCOUNT=$(cat /run/secrets/cli | jq -r ".activationKey" | base64 -d | jq -r ".account")
   [ $ACCOUNT != "azsuptime" ] && { echo "Activation key is invalid" ; exit 1 ; }
 
-  az storage blob upload-batch \
-          --destination $(cat /run/secrets/cli | jq -r ".activationKey" | base64 -d | jq -r ".customer") \
+  for F in $(ls /azs/cli/export)
+  do 
+    az storage blob upload \
+          --container-name $(cat /run/secrets/cli | jq -r ".activationKey" | base64 -d | jq -r ".customer") \
           --account-name $ACCOUNT \
+          --file /azs/cli/export/"$F" \
           --sas-token $(cat /run/secrets/cli | jq -r ".activationKey" | base64 -d | jq -r ".token") \
-          --source /azs/cli/export \
-  && azs_log_field T status azs_bridge \
-  || azs_log_field T status azs_bridge fail
+          --if-none-match "*" \
+          --name $F \
+          > /dev/null 2>&1 \
+      && echo "Bridge: $F" \
+      || echo "Exists: $F"
+  done
 }
 
 function azs_login
