@@ -96,7 +96,7 @@ function azs_job_end
 function azs_registration
 {
   local ACCOUNT=$(echo $ARGUMENTS_JSON | jq -r ".activationKey" | base64 -d | jq -r ".account")
-  [ $ACCOUNT != "azsuptime" ] && { echo "Activation key is invalid" ; exit 1 ; }
+  [ $ACCOUNT != "aimlessazsuptime" ] && { echo "Activation key is invalid" ; exit 1 ; }
 
   local FILENAME=deploy-$(echo $ARGUMENTS_JSON | jq -r ".tenantSubscriptionId")-$(date --utc +y%Gw%V-m%md%dh%Hm%M)-v$(sudo cat /azs/common/config.json | jq -r ".version.script").log
   echo "registration" > $FILENAME
